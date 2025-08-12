@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation - Property Investment Analyzer{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1 class="page-title">
+        <i class="fas fa-book me-3"></i>
+        Documentation
+    </h1>
+    <p class="page-subtitle">
+        Learn how to use the Property Investment Analyzer and understand its features
+    </p>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-info-circle"></i>
+            Getting Started
+        </h5>
+    </div>
+    <div class="card-body">
+        <ul>
+            <li>Upload your property dataset in CSV or Excel format on the <strong>Analyze Data</strong> page.</li>
+            <li>Configure analysis options and start the comprehensive analysis.</li>
+            <li>View results and download detailed reports.</li>
+            <li>Use the <strong>Single Prediction</strong> page for instant tax fairness assessment of individual properties.</li>
+            <li>Check <strong>Models</strong> for AI model status and architecture details.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-cogs"></i>
+            Features
+        </h5>
+    </div>
+    <div class="card-body">
+        <ul>
+            <li><strong>Tax Fairness Analysis:</strong> Detects anomalies in property tax assessments using AI.</li>
+            <li><strong>Zoning Classification:</strong> Predicts and verifies property zoning designations.</li>
+            <li><strong>Investment Risk Assessment:</strong> Evaluates investment risks for properties.</li>
+            <li><strong>Comprehensive Reporting:</strong> Generates downloadable reports for your analyses.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-question-circle"></i>
+            FAQ
+        </h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Q:</strong> What file formats are supported?<br>
+        <strong>A:</strong> CSV, XLSX, and XLS files up to 100MB.</p>
+        <p><strong>Q:</strong> How do I interpret the tax fairness results?<br>
+        <strong>A:</strong> The system compares your current tax to a predicted fair tax and provides recommendations.</p>
+        <p><strong>Q:</strong> Can I use my own AI models?<br>
+        <strong>A:</strong> Yes, you can integrate custom models by updating the codebase.</p>
+    </div>
+</div>
+{% endblock %}

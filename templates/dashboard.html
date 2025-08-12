@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Property Investment Analyzer{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1 class="page-title">
+        <i class="fas fa-chart-line me-3"></i>
+        Analytics Dashboard
+    </h1>
+    <p class="page-subtitle">
+        Real-time insights and performance metrics for your property analysis system
+    </p>
+</div>
+
+<!-- Model Performance -->
+<div class="row mb-4">
+    {% if analytics.model_performance.tax_fairness %}
+    <div class="col-lg-4 mb-3">
+        <div class="metric-card">
+            <div class="metric-value text-success">
+                {{ "%.1f"|format(analytics.model_performance.tax_fairness.r2_score * 100) }}%
+            </div>
+            <div class="metric-label">Tax Fairness Model</div>
+            <div class="mt-2">
+                <span class="badge bg-{{ 'success' if analytics.model_performance.tax_fairness.status == 'excellent' else 'warning' }}">
+                    {{ analytics.model_performance.tax_fairness.status|title }}
+                </span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if analytics.model_performance.zoning_classification %}
+    <div class="col-lg-4 mb-3">
+        <div class="metric-card">
+            <div class="metric-value text-primary">
+                {{ "%.1f"|format(analytics.model_performance.zoning_classification.accuracy * 100) }}%
+            </div>
+            <div class="metric-label">Zoning Classification</div>
+            <div class="mt-2">
+                <span class="badge bg-{{ 'success' if analytics.model_performance.zoning_classification.status == 'excellent' else 'warning' }}">
+                    {{ analytics.model_performance.zoning_classification.status|title }}
+                </span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if analytics.model_performance.investment_risk %}
+    <div class="col-lg-4 mb-3">
+        <div class="metric-card">
+            <div class="metric-value text-warning">
+                {{ "%.1f"|format(analytics.model_performance.investment_risk.r2_score * 100) }}%
+            </div>
+            <div class="metric-label">Investment Risk</div>
+            <div class="mt-2">
+                <span class="badge bg-{{ 'success' if analytics.model_performance.investment_risk.status == 'excellent' else 'warning' }}">
+                    {{ analytics.model_performance.investment_risk.status|title }}
+                </span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row">
+    <!-- Performance Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-area"></i>
+                    Model Performance Trends
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-server"></i>
+                    System Health
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>CPU Usage</span>
+                        <span>{{ analytics.system_health.cpu_usage }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ analytics.system_health.cpu_usage }}%"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Memory Usage</span>
+                        <span>{{ analytics.system_health.memory_usage }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" style="width: {{ analytics.system_health.memory_usage }}%"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Disk Usage</span>
+                        <span>{{ analytics.system_health.disk_usage }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: {{ analytics.system_health.disk_usage }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Analyses -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-history"></i>
+            Recent Analyses
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if analytics.recent_analyses %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Analysis ID</th>
+                            <th>File</th>
+                            <th>Timestamp</th>
+                            <th>Status</th>
+                            <th>Properties</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for analysis in analytics.recent_analyses %}
+                        <tr>
+                            <td><code>{{ analysis.id[:8] }}...</code></td>
+                            <td>{{ analysis.filename }}</td>
+                            <td>{{ analysis.timestamp[:19] }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if analysis.status == 'completed' else 'danger' }}">
+                                    {{ analysis.status|title }}
+                                </span>
+                            </td>
+                            <td>{{ analysis.total_properties or 'N/A' }}</td>
+                            <td>
+                                <a href="{{ url_for('results', analysis_id=analysis.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No analyses yet</h5>
+                <p class="text-muted">Upload data to start analyzing properties</p>
+                <a href="{{ url_for('analyze') }}" class="btn btn-primary">
+                    <i class="fas fa-upload me-2"></i>Start Analysis
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Performance Chart
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            datasets: [{
+                label: 'Tax Fairness',
+                data: [0.85, 0.87, 0.88, 0.89, 0.89, 0.892],
+                borderColor: 'rgb(37, 99, 235)',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Zoning Classification',
+                data: [0.78, 0.80, 0.82, 0.83, 0.834, 0.834],
+                borderColor: 'rgb(16, 185, 129)',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Investment Risk',
+                data: [0.82, 0.84, 0.86, 0.87, 0.875, 0.876],
+                borderColor: 'rgb(245, 158, 11)',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Model Accuracy Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 0.7,
+                    max: 1.0,
+                    ticks: {
+                        callback: function(value) {
+                            return (value * 100).toFixed(1) + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
