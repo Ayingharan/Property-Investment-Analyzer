@@ -1,0 +1,615 @@
+{% extends "base.html" %}
+
+{% block title %}Single Property Prediction - Property Investment Analyzer{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1 class="page-title">
+        <i class="fas fa-search me-3"></i>
+        Single Property Tax Fairness Assessment
+    </h1>
+    <p class="page-subtitle">
+        Get instant AI-powered tax fairness analysis for individual properties
+    </p>
+</div>
+
+<!-- Property Input Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-home"></i>
+            Property Information
+        </h5>
+    </div>
+    <div class="card-body">
+        <form id="predictionForm">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="propertyType" class="form-label">
+                        <i class="fas fa-home me-2 text-primary"></i>Property Type
+                    </label>
+                    <select class="form-select" id="propertyType" required>
+                        <option value="">Select property type...</option>
+                        <option value="residential">Residential</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="industrial">Industrial</option>
+                        <option value="mixed_use">Mixed Use</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="yearBuilt" class="form-label">
+                        <i class="fas fa-calendar me-2 text-primary"></i>Year Built
+                    </label>
+                    <input type="number" class="form-control" id="yearBuilt" min="1800" max="2024" placeholder="e.g., 1995" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="landValue" class="form-label">
+                        <i class="fas fa-map me-2 text-success"></i>Assessed Land Value ($)
+                    </label>
+                    <input type="number" class="form-control" id="landValue" min="0" step="1000" placeholder="e.g., 150,000" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="improvementValue" class="form-label">
+                        <i class="fas fa-building me-2 text-success"></i>Assessed Improvement Value ($)
+                    </label>
+                    <input type="number" class="form-control" id="improvementValue" min="0" step="1000" placeholder="e.g., 250,000" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="squareFootage" class="form-label">
+                        <i class="fas fa-ruler-combined me-2 text-info"></i>Living Area (sq ft)
+                    </label>
+                    <input type="number" class="form-control" id="squareFootage" min="0" placeholder="e.g., 2,000">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="lotSize" class="form-label">
+                        <i class="fas fa-expand-arrows-alt me-2 text-info"></i>Lot Size (sq ft)
+                    </label>
+                    <input type="number" class="form-control" id="lotSize" min="0" placeholder="e.g., 8,000">
+                </div>
+            </div>
+
+            <!-- THE CRITICAL MISSING FIELD - NOW ADDED! -->
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="alert alert-warning border-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Required for Tax Fairness Assessment:</strong> Enter your current annual property tax amount
+                    </div>
+                    <label for="currentTax" class="form-label">
+                        <i class="fas fa-dollar-sign me-2 text-danger"></i>
+                        <strong>Current Annual Property Tax ($)</strong>
+                    </label>
+                    <input type="number" class="form-control form-control-lg" id="currentTax" 
+                        min="0" step="100" placeholder="e.g., 15,000" required
+                        style="border: 2px solid #dc2626; font-weight: 600;">
+                    <div class="form-text">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Find this on your property tax bill or assessment notice
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg" id="predictBtn">
+                    <i class="fas fa-calculator me-2"></i>
+                    Assess Tax Fairness
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Prediction Results -->
+<div class="row" id="predictionResults" style="display: none;">
+    <!-- Tax Fairness Prediction - ENHANCED -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-balance-scale"></i>
+                    Tax Fairness Assessment Results
+                </h5>
+            </div>
+            <div class="card-body" id="taxPrediction">
+                <!-- Enhanced tax prediction results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Other predictions in smaller cards -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-map-marked-alt"></i>
+                    Zoning Classification
+                </h5>
+            </div>
+            <div class="card-body" id="zoningPrediction">
+                <!-- Zoning prediction results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-shield-alt"></i>
+                    Investment Risk
+                </h5>
+            </div>
+            <div class="card-body" id="riskPrediction">
+                <!-- Risk prediction results will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading State -->
+<div id="loadingState" style="display: none;">
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5 class="mt-3">Analyzing Tax Fairness...</h5>
+        <p class="text-muted">Comparing your property against similar properties in the database</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('predictionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    generatePredictions();
+});
+
+function generatePredictions() {
+    // Show loading state
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('predictionResults').style.display = 'none';
+    
+    // Disable submit button
+    const predictBtn = document.getElementById('predictBtn');
+    predictBtn.disabled = true;
+    predictBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+
+    // Collect form data - INCLUDING CURRENT TAX!
+    const formData = {
+        property_type: document.getElementById('propertyType').value,
+        year_built: parseInt(document.getElementById('yearBuilt').value),
+        land_value: parseFloat(document.getElementById('landValue').value),
+        improvement_value: parseFloat(document.getElementById('improvementValue').value),
+        square_footage: parseFloat(document.getElementById('squareFootage').value) || 0,
+        lot_size: parseFloat(document.getElementById('lotSize').value) || 0,
+        current_tax: parseFloat(document.getElementById('currentTax').value) // THE CRITICAL FIELD!
+    };
+
+    fetch('/api/predict_property', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            property_data: formData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('loadingState').style.display = 'none';
+        
+        if (data.success) {
+            displayPredictions(data.predictions);
+            document.getElementById('predictionResults').style.display = 'block';
+        } else {
+            alert('Prediction failed: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        document.getElementById('loadingState').style.display = 'none';
+        alert('Prediction failed: ' + error.message);
+    })
+    .finally(() => {
+        // Re-enable submit button
+        predictBtn.disabled = false;
+        predictBtn.innerHTML = '<i class="fas fa-calculator me-2"></i>Assess Tax Fairness';
+    });
+}
+
+function displayPredictions(predictions) {
+    // ENHANCED Tax Fairness Display
+    if (predictions.tax_fairness && !predictions.tax_fairness.error) {
+        const tax = predictions.tax_fairness;
+        const details = tax.assessment_details || {};
+        
+        document.getElementById('taxPrediction').innerHTML = `
+            <div class="row">
+                <div class="col-md-4 text-center mb-3">
+                    <div class="metric-value text-${tax.color}">${tax.current_tax.toLocaleString()}</div>
+                    <div class="metric-label">Current Annual Tax</div>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <div class="metric-value text-primary">${tax.predicted_tax.toLocaleString()}</div>
+                    <div class="metric-label">Expected Fair Tax</div>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <div class="metric-value text-${tax.color}">
+                        ${tax.difference > 0 ? '+' : ''}${tax.difference.toLocaleString()}
+                    </div>
+                    <div class="metric-label">Difference (${tax.percentage_difference}%)</div>
+                </div>
+            </div>
+            
+            <div class="alert alert-${tax.color} border-0 mb-4">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-${tax.color === 'success' ? 'check-circle' : tax.color === 'danger' ? 'exclamation-triangle' : 'info-circle'} fa-2x me-3"></i>
+                    <div>
+                        <h4 class="mb-1">${tax.fair_assessment}</h4>
+                        <p class="mb-0">
+                            Your tax is <strong>${tax.percentage_difference}%</strong> 
+                            ${tax.difference > 0 ? 'higher' : 'lower'} than expected for similar properties
+                        </p>
+                    </div>
+                </div>
+                <hr>
+                <p class="mb-0">
+                    <strong>Recommendation:</strong> ${tax.recommendation}
+                </p>
+            </div>
+            
+            ${details.total_property_value ? `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-chart-bar me-2"></i>Assessment Details</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Property Value:</strong> ${details.total_property_value.toLocaleString()}</li>
+                        <li><strong>Current Tax Rate:</strong> ${details.effective_tax_rate_current}%</li>
+                        <li><strong>Expected Tax Rate:</strong> ${details.effective_tax_rate_predicted}%</li>
+                        <li><strong>Market Position:</strong> ${details.market_position}</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-info-circle me-2"></i>Analysis Info</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Confidence Level:</strong> ${(tax.confidence * 100).toFixed(0)}%</li>
+                        <li><strong>Comparison Base:</strong> Similar properties in area</li>
+                        <li><strong>Analysis Date:</strong> ${new Date().toLocaleDateString()}</li>
+                        <li><strong>Next Review:</strong> Annual reassessment</li>
+                    </ul>
+                </div>
+            </div>
+            ` : ''}
+        `;
+    } else {
+        document.getElementById('taxPrediction').innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Unable to generate tax fairness assessment: ${predictions.tax_fairness.error || 'Unknown error'}
+            </div>
+        `;
+    }
+
+    // ENHANCED Zoning Classification Display with Full Details
+    if (predictions.zoning_classification && !predictions.zoning_classification.error) {
+        const zoning = predictions.zoning_classification;
+        const analysis = zoning.zoning_analysis || {};
+        
+        document.getElementById('zoningPrediction').innerHTML = `
+            <div class="row mb-3">
+                <div class="col-md-6 text-center">
+                    <div class="metric-value text-success">${zoning.predicted_zone}</div>
+                    <div class="metric-label">Predicted Zone</div>
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="metric-value text-info">${zoning.subzone_classification || 'Standard'}</div>
+                    <div class="metric-label">Zone Sub-Classification</div>
+                </div>
+            </div>
+            
+            <div class="alert alert-${zoning.confidence > 0.8 ? 'success' : zoning.confidence > 0.6 ? 'warning' : 'info'} border-0 mb-3">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-map-marker-alt fa-2x me-3"></i>
+                    <div>
+                        <h5 class="mb-1">Zoning Prediction: ${zoning.predicted_zone}</h5>
+                        <p class="mb-0">
+                            <strong>Confidence Level:</strong> ${zoning.confidence_level} (${(zoning.confidence * 100).toFixed(1)}%)
+                        </p>
+                    </div>
+                </div>
+                <hr>
+                <p class="mb-0">
+                    <strong>Analysis:</strong> ${zoning.recommendation}
+                </p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-ruler-combined me-2"></i>Property Analysis</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Building Coverage:</strong> ${analysis.building_coverage || 'N/A'}</li>
+                        <li><strong>Density Class:</strong> ${analysis.density_classification || zoning.subzone_classification}</li>
+                        <li><strong>Coverage Ratio:</strong> ${(zoning.coverage_ratio * 100).toFixed(1)}%</li>
+                        <li><strong>Zoning Compliance:</strong> 
+                            <span class="badge bg-${analysis.compliance_factors && analysis.compliance_factors.length > 0 && !analysis.compliance_factors[0].includes('No compliance') ? 'warning' : 'success'}">
+                                ${analysis.compliance_factors && analysis.compliance_factors.length > 0 && !analysis.compliance_factors[0].includes('No compliance') ? 'Review Required' : 'Compliant'}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-list-alt me-2"></i>Additional Details</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Primary Zone:</strong> ${zoning.predicted_zone}</li>
+                        <li><strong>Alternative Zones:</strong> 
+                            ${analysis.alternative_zones ? analysis.alternative_zones.join(', ') : 'None identified'}
+                        </li>
+                        <li><strong>Analysis Date:</strong> ${new Date().toLocaleDateString()}</li>
+                        <li><strong>Zone Verification:</strong> Recommended for permits</li>
+                    </ul>
+                </div>
+            </div>
+            
+            ${analysis.compliance_factors && analysis.compliance_factors.length > 0 ? `
+            <div class="mt-3">
+                <h6><i class="fas fa-exclamation-circle me-2"></i>Compliance Notes:</h6>
+                <ul class="list-unstyled">
+                    ${analysis.compliance_factors.map(factor => `<li><i class="fas fa-${factor.includes('No compliance') ? 'check text-success' : 'info-circle text-warning'} me-2"></i>${factor}</li>`).join('')}
+                </ul>
+            </div>
+            ` : ''}
+            
+            <div class="progress mt-3">
+                <div class="progress-bar bg-success" style="width: ${zoning.confidence * 100}%"></div>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted">Prediction Confidence</small>
+                <small class="text-muted">${(zoning.confidence * 100).toFixed(1)}%</small>
+            </div>
+        `;
+    } else {
+        document.getElementById('zoningPrediction').innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Unable to generate zoning prediction: ${predictions.zoning_classification.error || 'Unknown error'}
+            </div>
+        `;
+    }
+
+    // ENHANCED Investment Risk Assessment with Full Details
+    if (predictions.investment_risk && !predictions.investment_risk.error) {
+        const risk = predictions.investment_risk;
+        const details = risk.analysis_details || {};
+        const factors = risk.risk_factors || {};
+        
+        document.getElementById('riskPrediction').innerHTML = `
+            <!-- Professional Risk Header -->
+            <div class="risk-assessment-header mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center">
+                            <div class="risk-icon-container me-3">
+                                <i class="fas fa-shield-alt fa-2x text-${risk.color}"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 text-${risk.color}">${risk.risk_category}</h3>
+                                <p class="mb-0 text-muted">Investment Risk Assessment</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="risk-score-display">
+                            <div class="risk-score-number text-${risk.color}">${risk.risk_percentage}%</div>
+                            <div class="risk-grade-badge">
+                                <span class="badge bg-${risk.color} fs-5 px-3 py-2">Grade ${risk.investment_grade}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Professional Recommendation Card -->
+            <div class="recommendation-card mb-4">
+                <div class="recommendation-header">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    Investment Recommendation
+                </div>
+                <div class="recommendation-body">
+                    <h5 class="recommendation-title text-${risk.color}">${risk.recommendation}</h5>
+                    <p class="recommendation-text mb-0">
+                        Based on comprehensive analysis of property characteristics, market conditions, and risk factors, 
+                        this property shows <strong>${risk.risk_category.toLowerCase()}</strong> investment potential.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Enhanced Risk Factor Analysis -->
+            <div class="risk-factors-section">
+                <div class="section-header mb-4">
+                    <h5 class="section-title">
+                        <i class="fas fa-chart-pie me-2 text-primary"></i>
+                        Individual Risk Factor Analysis
+                    </h5>
+                    <p class="section-subtitle text-muted">
+                        Detailed breakdown of each risk component contributing to the overall assessment
+                    </p>
+                </div>
+                
+                <div class="risk-factors-grid">
+                    ${Object.entries(factors).map(([key, factor]) => {
+                        const riskLevel = factor.value < 0.05 ? 'success' : factor.value < 0.15 ? 'warning' : 'danger';
+                        const riskText = factor.value < 0.05 ? 'Low' : factor.value < 0.15 ? 'Medium' : 'High';
+                        const riskPercentage = (factor.value * 100).toFixed(1);
+                        const progressWidth = Math.min((factor.value / 0.25) * 100, 100);
+                        
+                        // Get appropriate icon for each risk factor
+                        const factorIcons = {
+                            'age_risk': 'fa-calendar-alt',
+                            'value_risk': 'fa-chart-bar',
+                            'size_risk': 'fa-ruler-combined',
+                            'type_risk': 'fa-building',
+                            'market_risk': 'fa-globe-americas'
+                        };
+                        const iconClass = factorIcons[key] || 'fa-exclamation-triangle';
+                        
+                        return `
+                        <div class="risk-factor-card">
+                            <div class="risk-factor-header">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="factor-info">
+                                        <div class="factor-icon">
+                                            <i class="fas ${iconClass} text-${riskLevel}"></i>
+                                        </div>
+                                        <div class="factor-title">
+                                            <h6 class="mb-0">${key.replace('_', ' ').replace(/\w/g, l => l.toUpperCase())}</h6>
+                                            <small class="text-muted">${factor.category}</small>
+                                        </div>
+                                    </div>
+                                    <div class="risk-badge-container">
+                                        <span class="risk-badge risk-badge-${riskLevel}">
+                                            ${riskText}
+                                        </span>
+                                        <div class="risk-percentage">${riskPercentage}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="risk-factor-body">
+                                <div class="factor-description mb-3">
+                                    <p class="mb-0">${factor.description || 'Risk assessment based on property characteristics'}</p>
+                                </div>
+                                
+                                <div class="risk-progress-container">
+                                    <div class="risk-progress-bar">
+                                        <div class="risk-progress-fill bg-${riskLevel}" style="width: ${progressWidth}%"></div>
+                                    </div>
+                                    <div class="progress-labels">
+                                        <small class="text-muted">Low Risk</small>
+                                        <small class="text-muted">High Risk</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+            
+            <!-- Property Summary and Investment Details -->
+            <div class="row mt-4">
+                <div class="col-lg-6">
+                    <div class="property-summary-card">
+                        <div class="summary-header">
+                            <h6><i class="fas fa-info-circle me-2 text-primary"></i>Property Summary</h6>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-item">
+                                <span class="summary-label">Property Age:</span>
+                                <span class="summary-value">${details.property_age || 'N/A'} years</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Total Value:</span>
+                                <span class="summary-value">${details.total_value ? details.total_value.toLocaleString() : 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Land Ratio:</span>
+                                <span class="summary-value">${details.land_ratio || 'N/A'}% of total value</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Investment Outlook:</span>
+                                <span class="badge bg-${details.investment_outlook === 'Positive' ? 'success' : details.investment_outlook === 'Neutral' ? 'warning' : 'danger'} outlook-badge">
+                                    ${details.investment_outlook || 'Unknown'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="risk-distribution-card">
+                        <div class="distribution-header">
+                            <h6><i class="fas fa-chart-bar me-2 text-success"></i>Risk Contribution Analysis</h6>
+                        </div>
+                        <div class="distribution-content">
+                            <p class="distribution-subtitle">How each factor contributes to overall risk:</p>
+                            <div class="contribution-list">
+                                ${Object.entries(risk.risk_distribution || {}).map(([factor, data]) => 
+                                    `<div class="contribution-item">
+                                        <div class="contribution-factor">${factor.replace('_', ' ').replace(/\w/g, l => l.toUpperCase())}</div>
+                                        <div class="contribution-bar">
+                                            <div class="contribution-fill" style="width: ${data.percentage}%"></div>
+                                        </div>
+                                        <div class="contribution-percentage">${data.percentage}%</div>
+                                    </div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Investment Recommendations -->
+            ${risk.recommendations && risk.recommendations.length > 0 ? `
+            <div class="recommendations-section mt-4">
+                <div class="recommendations-card">
+                    <div class="recommendations-header">
+                        <h6><i class="fas fa-lightbulb me-2"></i>Investment Recommendations</h6>
+                    </div>
+                    <div class="recommendations-content">
+                        <div class="recommendations-grid">
+                            ${risk.recommendations.map((rec, index) => `
+                                <div class="recommendation-item">
+                                    <div class="recommendation-number">${index + 1}</div>
+                                    <div class="recommendation-text">${rec}</div>
+                                </div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            ` : ''}
+            
+            <!-- Final Risk Summary -->
+            <div class="final-risk-summary mt-4">
+                <div class="risk-summary-content">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="summary-title">Overall Investment Assessment</h6>
+                            <p class="summary-text mb-0">
+                                Risk Level: <strong class="text-${risk.color}">${risk.risk_category}</strong> • 
+                                Investment Grade: <strong>${risk.investment_grade}</strong> • 
+                                Confidence: <strong>High</strong>
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="final-progress-container">
+                                <div class="final-progress-bar">
+                                    <div class="final-progress-fill bg-${risk.color}" style="width: ${risk.risk_score * 100}%"></div>
+                                </div>
+                                <div class="final-progress-label">
+                                    <small class="text-muted">Risk Level: ${risk.risk_category}</small>
+                                    <strong class="text-${risk.color}">${risk.risk_percentage}% Risk</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        document.getElementById('riskPrediction').innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Unable to generate risk assessment: ${predictions.investment_risk.error || 'Unknown error'}
+            </div>
+        `;
+    }
+}
+</script>
+{% endblock %}

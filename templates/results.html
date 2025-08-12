@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - Property Investment Analyzer{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1 class="page-title">
+        <i class="fas fa-chart-bar me-3"></i>
+        Analysis Results
+    </h1>
+    <p class="page-subtitle">
+        Comprehensive property integrity analysis for {{ analysis.filename }}
+    </p>
+</div>
+
+<!-- Analysis Summary -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ analysis.total_properties or 'N/A' }}</div>
+            <div class="metric-label">Properties Analyzed</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ analysis.successful_phases or 0 }}</div>
+            <div class="metric-label">Successful Phases</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ "%.1f"|format(analysis.total_duration or 0) }}s</div>
+            <div class="metric-label">Total Duration</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">
+                <span class="badge bg-{{ 'success' if analysis.status == 'completed' else 'danger' }}">
+                    {{ analysis.status|title }}
+                </span>
+            </div>
+            <div class="metric-label">Analysis Status</div>
+        </div>
+    </div>
+</div>
+
+<!-- Analysis Results -->
+{% if analysis.results %}
+<div class="row">
+    <!-- Tax Fairness Results -->
+    {% if analysis.results.tax_fairness %}
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-balance-scale"></i>
+                    Tax Fairness Analysis
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="metric-value text-primary">
+                        {% if analysis.results.tax_fairness.status == 'success' %}
+                            {{ "%.1f"|format((analysis.results.tax_fairness.r2_score or 0) * 100) }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="metric-label">R² Score</div>
+                </div>
+                
+                {% if analysis.results.tax_fairness.status == 'success' %}
+                    <ul class="list-unstyled">
+                        <li class="d-flex justify-content-between">
+                            <span>Anomalies Detected:</span>
+                            <strong class="text-warning">{{ analysis.results.tax_fairness.anomalies_detected or 0 }}</strong>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span>Duration:</span>
+                            <span>{{ "%.1f"|format(analysis.results.tax_fairness.duration or 0) }}s</span>
+                        </li>
+                    </ul>
+                    <div class="alert alert-success mt-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ analysis.results.tax_fairness.message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ analysis.results.tax_fairness.message }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Zoning Classification Results -->
+    {% if analysis.results.zoning_classification %}
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-map-marked-alt"></i>
+                    Zoning Classification
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="metric-value text-success">
+                        {% if analysis.results.zoning_classification.status == 'success' %}
+                            {{ "%.1f"|format((analysis.results.zoning_classification.accuracy or 0) * 100) }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+                
+                {% if analysis.results.zoning_classification.status == 'success' %}
+                    <ul class="list-unstyled">
+                        <li class="d-flex justify-content-between">
+                            <span>Misclassifications:</span>
+                            <strong class="text-warning">{{ analysis.results.zoning_classification.misclassifications or 0 }}</strong>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span>Duration:</span>
+                            <span>{{ "%.1f"|format(analysis.results.zoning_classification.duration or 0) }}s</span>
+                        </li>
+                    </ul>
+                    <div class="alert alert-success mt-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ analysis.results.zoning_classification.message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ analysis.results.zoning_classification.message }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Investment Risk Results -->
+    {% if analysis.results.investment_risk %}
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-shield-alt"></i>
+                    Investment Risk
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="metric-value text-warning">
+                        {% if analysis.results.investment_risk.status == 'success' %}
+                            {{ "%.1f"|format((analysis.results.investment_risk.r2_score or 0) * 100) }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="metric-label">R² Score</div>
+                </div>
+                
+                {% if analysis.results.investment_risk.status == 'success' %}
+                    <ul class="list-unstyled">
+                        <li class="d-flex justify-content-between">
+                            <span>High Risk Properties:</span>
+                            <strong class="text-danger">{{ analysis.results.investment_risk.high_risk_properties or 0 }}</strong>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span>Duration:</span>
+                            <span>{{ "%.1f"|format(analysis.results.investment_risk.duration or 0) }}s</span>
+                        </li>
+                    </ul>
+                    <div class="alert alert-success mt-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ analysis.results.investment_risk.message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ analysis.results.investment_risk.message }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Actions -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-tools"></i>
+            Actions
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <a href="{{ url_for('generate_report', analysis_id=analysis.id) }}" class="btn btn-primary w-100">
+                    <i class="fas fa-file-pdf me-2"></i>
+                    Download PDF Report
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="{{ url_for('analyze') }}" class="btn btn-success w-100">
+                    <i class="fas fa-plus me-2"></i>
+                    New Analysis
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-info w-100">
+                    <i class="fas fa-chart-line me-2"></i>
+                    View Dashboard
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <button class="btn btn-outline-secondary w-100" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>
+                    Print Results
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Property Investment Analyzer{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1 class="page-title">
+        <i class="fas fa-home me-3"></i>
+        Welcome to Property Investment Analyzer
+    </h1>
+    <p class="page-subtitle">
+        Professional AI-powered property analysis and integrity assessment platform
+    </p>
+</div>
+
+<!-- System Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.models_available }}</div>
+            <div class="stat-label">AI Models Available</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_analyses }}</div>
+            <div class="stat-label">Total Analyses</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.properties_analyzed }}</div>
+            <div class="stat-label">Properties Analyzed</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.uptime }}</div>
+            <div class="stat-label">System Uptime</div>
+        </div>
+    </div>
+</div>
+
+<!-- Feature Cards -->
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Tax Fairness Analysis
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Advanced neural network analysis to identify tax assessment anomalies and ensure fair property taxation across your dataset.
+                </p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i>AI-powered anomaly detection</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Statistical validation</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Comprehensive reporting</li>
+                </ul>
+                <a href="{{ url_for('analyze') }}" class="btn btn-primary">
+                    <i class="fas fa-play me-2"></i>Start Analysis
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-map-marked-alt"></i>
+                    Zoning Classification
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Intelligent zoning classification system using Multi Layers Perceptron algorithms to verify and predict property zoning designations.
+                </p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i>Multi-class classification</li>
+                    <li><i class="fas fa-check text-success me-2"></i>High accuracy predictions</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Zoning compliance checks</li>
+                </ul>
+                <a href="{{ url_for('predict_single') }}" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Predict Zoning
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Investment Risk Assessment
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Comprehensive risk analysis for property investments using advanced machine learning models and market indicators.
+                </p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i>Risk scoring algorithms</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Market trend analysis</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Investment recommendations</li>
+                </ul>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                    <i class="fas fa-chart-line me-2"></i>View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-bolt"></i>
+            Quick Actions
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('analyze') }}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-upload d-block mb-2" style="font-size: 2rem;"></i>
+                    Upload & Analyze
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('predict_single') }}" class="btn btn-outline-success w-100">
+                    <i class="fas fa-calculator d-block mb-2" style="font-size: 2rem;"></i>
+                    Single Prediction
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('models_status') }}" class="btn btn-outline-warning w-100">
+                    <i class="fas fa-cogs d-block mb-2" style="font-size: 2rem;"></i>
+                    Manage Models
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('documentation') }}" class="btn btn-outline-info w-100">
+                    <i class="fas fa-book d-block mb-2" style="font-size: 2rem;"></i>
+                    Documentation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Health -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-heartbeat"></i>
+            System Health
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>AI Models</span>
+                    <span class="badge bg-success">Online</span>
+                </div>
+                <div class="progress mb-3">
+                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Database</span>
+                    <span class="badge bg-success">Connected</span>
+                </div>
+                <div class="progress mb-3">
+                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>API Services</span>
+                    <span class="badge bg-success">Active</span>
+                </div>
+                <div class="progress mb-3">
+                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
